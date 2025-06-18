@@ -3,8 +3,11 @@ package tech.test.core.auth.secureapptest.config;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,20 +18,22 @@ public class SecurityConfig {
 
     @Bean
     @SneakyThrows
-    public SecurityFilterChain filterChain(final HttpSecurity httpSecurity) {
-        httpSecurity
+    public SecurityFilterChain filterChain(final HttpSecurity http) {
+        http
                 .authorizeHttpRequests(configurer ->
-                        configurer
-                                .requestMatchers(
-                                        "/api/v1/greeting/hello"
-                                )
-                                .permitAll()
-                                .anyRequest().authenticated())
+                        configurer.anyRequest().authenticated())
                 .csrf(CsrfConfigurer::disable)
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
-        return httpSecurity.build();
+        return http.build();
+    }
+
+    @Bean
+    @Profile("dev")
+    WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.debug(true);
     }
 
 }
