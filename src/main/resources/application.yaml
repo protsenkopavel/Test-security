@@ -1,1 +1,6 @@
-spring.application.name=secure-app-test
+server:
+  port: 8081
+
+spring:
+  application:
+    name: secure-app-test
