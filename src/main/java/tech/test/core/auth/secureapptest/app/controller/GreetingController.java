@@ -1,26 +1,29 @@
 package tech.test.core.auth.secureapptest.app.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tech.test.core.auth.secureapptest.app.dto.UserDetailsDto;
+import tech.test.core.auth.secureapptest.app.service.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/v1/greeting")
+@RequiredArgsConstructor
 public class GreetingController {
+
+    private final AuthenticationService authenticationService;
 
     @GetMapping("/hello")
     public ResponseEntity<String> greetUser() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = jwt.getClaimAsString("preferred_username");
+        UserDetailsDto authenticatedUserDetails = authenticationService.getAuthenticatedUser();
 
         return ResponseEntity
                 .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("Hello, %s!".formatted(username));
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("Hello, %s!".formatted(authenticatedUserDetails.username()));
     }
 
 }
