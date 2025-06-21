@@ -11,6 +11,13 @@ spring:
         jwt:
           issuer-uri: http://localhost:8080/realms/test-realm
 
+keycloak:
+  client:
+    server-url: http://localhost:8080/
+    application-realm: test-realm
+    client-id: spring-boot-app
+    client-secret: vojHhxq8uAAtGE231S41jWfPUlHxLVp1
+
 logging:
   level:
     org.springframework.security: DEBUG

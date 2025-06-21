@@ -1,4 +1,4 @@
-POST http://localhost:8080/realms/test-realm/protocol/openid-connect/token
+POST http://{{host}}:{{identity-provider-port}}/realms/test-realm/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 client_id=spring-boot-app&client_secret=vojHhxq8uAAtGE231S41jWfPUlHxLVp1&username=test-user&password=test&grant_type=password

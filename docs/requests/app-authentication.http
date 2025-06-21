@@ -1,0 +1,10 @@
+POST http://{{host}}:{{app-port}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "login": "test-user",
+  "password": "test"
+}
+
+> {% client.global.set("access_token", response.body.access_token); %}
+

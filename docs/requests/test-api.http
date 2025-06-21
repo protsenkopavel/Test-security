@@ -1,0 +1,2 @@
+GET http://{{host}}:{{app-port}}//api/v1/greeting/hello
+Authorization: Bearer {{access_token}}

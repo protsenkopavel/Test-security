@@ -21,7 +21,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(final HttpSecurity http) {
         http
                 .authorizeHttpRequests(configurer ->
-                        configurer.anyRequest().authenticated())
+                        configurer
+                                .requestMatchers("/api/v1/auth/login").permitAll()
+                                .anyRequest().authenticated())
                 .csrf(CsrfConfigurer::disable)
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
