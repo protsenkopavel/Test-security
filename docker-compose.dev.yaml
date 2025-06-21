@@ -1,0 +1,51 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:${KEYCLOAK_DB_PORT_INTERNAL:-5432}/${KEYCLOAK_DB_NAME:-keycloak_db}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-postgres}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-postgres}
+    ports:
+      - "${KEYCLOAK_PORT_EXTERNAL:-8080}:${KEYCLOAK_PORT_INTERNAL:-8080}"
+    volumes:
+      - "${KEYCLOAK_IMPORT_PATH:-./config/keycloak/import}:/opt/keycloak/data/import"
+    depends_on:
+      - keycloak-db
+    command:
+      - ${KEYCLOAK_PROFILE:-start-dev}
+      - --import-realm
+    networks:
+      - app-network
+
+  keycloak-db:
+    image: postgres:17.5
+    ports:
+      - "${KEYCLOAK_DB_PORT_EXTERNAL:-5432}:${KEYCLOAK_DB_PORT_INTERNAL:-5432}"
+    environment:
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak_db}
+    volumes:
+      - "${KEYCLOAK_DB_VOLUME:-/var/lib/keycloak-db:/var/lib/postgresql/data}:/var/lib/postgresql/data"
+    networks:
+      - app-network
+
+  spring-boot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    ports:
+      - "${APP_PORT:-8081}:${APP_PORT:-8081}"
+    depends_on:
+      - keycloak
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,23 @@
+server:
+  port: ${APP_PORT:8081}
+
+spring:
+  application:
+    name: secure-app-test
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT_INTERNAL:8080}/realms/${KEYCLOAK_APPLICATION_REALM:test-realm}
+
+keycloak:
+  client:
+    server-url: http://${KEYCLOAK_HOST:keycloak}:${KEYCLOAK_PORT_INTERNAL:8080}/
+    application-realm: ${KEYCLOAK_APPLICATION_REALM:test-realm}
+    client-id: ${KEYCLOAK_CLIENT_ID:spring-boot-app}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET:vojHhxq8uAAtGE231S41jWfPUlHxLVp1}
+
+logging:
+  level:
+    org.springframework.security: ${APP_LOGGING_LEVEL:DEBUG}

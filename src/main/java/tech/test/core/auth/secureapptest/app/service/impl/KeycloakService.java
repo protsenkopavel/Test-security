@@ -9,6 +9,7 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.stereotype.Service;
 import tech.test.core.auth.secureapptest.app.dto.LoginRq;
 import tech.test.core.auth.secureapptest.app.dto.TokenRs;
+import tech.test.core.auth.secureapptest.app.exception.AuthenticationException;
 import tech.test.core.auth.secureapptest.app.service.OAuthService;
 import tech.test.core.auth.secureapptest.config.KeycloakConfig;
 
@@ -30,14 +31,22 @@ public class KeycloakService implements OAuthService {
                 .grantType(OAuth2Constants.PASSWORD)
                 .build();
 
-        AccessTokenResponse token = keycloak.tokenManager().getAccessToken();
+        try {
+            AccessTokenResponse token = keycloak.tokenManager().getAccessToken();
 
-        return new TokenRs(
-                token.getToken(),
-                token.getExpiresIn(),
-                token.getRefreshToken(),
-                token.getRefreshExpiresIn()
-        );
+            log.debug("Успешная аутентификация пользователя: {}", loginRq.login());
+
+            return new TokenRs(
+                    token.getToken(),
+                    token.getExpiresIn(),
+                    token.getRefreshToken(),
+                    token.getRefreshExpiresIn()
+            );
+        } catch (Exception e) {
+            log.debug("Ошибка аутентификации пользователя: {}", loginRq.login(), e);
+            throw new AuthenticationException(
+                    "Неверное имя пользователя или пароль");
+        }
     }
 
 }
